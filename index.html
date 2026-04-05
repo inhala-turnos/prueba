@@ -221,7 +221,7 @@ body{font-family:'Manrope',sans-serif;color:var(--ink);background:var(--bg);}
 .blk-date-range{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .sl-st{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin-bottom:1px;}
 .sl.free .sl-st{color:#065F46;}.sl.blkd .sl-st{color:var(--ink4);}
-.sl-nm{font-size:11px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sl-nm{font-size:11px;font-weight:700;color:var(--ink);white-space:normal;overflow:visible;text-overflow:unset;word-break:break-word;}
 .fchip{min-height:44px;border-radius:9px;background:var(--emerald-light);border:1.5px dashed #6EE7B7;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:5px;transition:all var(--t);}
 .fchip:hover{background:#C7F5E5;transform:scale(1.025);}
 .fchip-n{font-size:16px;font-weight:800;color:#065F46;line-height:1;}
@@ -390,7 +390,16 @@ body{font-family:'Manrope',sans-serif;color:var(--ink);background:var(--bg);}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--ink5);border-radius:99px;}
-@media(max-width:768px){.sidebar{display:none;}.main-area{padding:18px 14px;}}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--ink);border-top:1px solid rgba(255,255,255,.1);padding:6px 4px calc(6px + env(safe-area-inset-bottom));gap:0;justify-content:space-around;align-items:flex-end;box-shadow:0 -4px 20px rgba(0,0,0,.3);}
+.mn-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 8px;min-width:44px;min-height:52px;border:none;background:transparent;color:rgba(255,255,255,.4);font-family:'Manrope',sans-serif;cursor:pointer;border-radius:10px;transition:color var(--t),background var(--t);flex:1;}
+.mn-item:hover{color:rgba(255,255,255,.75);background:rgba(255,255,255,.06);}
+.mn-item.active{color:var(--accent);}
+.mn-item.active .mn-ico{text-shadow:0 0 12px rgba(26,79,232,.8);}
+.mn-ico{font-size:17px;line-height:1;}
+.mn-lbl{font-size:9px;font-weight:700;letter-spacing:.3px;white-space:nowrap;}
+.mn-logout{color:rgba(255,255,255,.25);}
+.mn-logout:hover{color:#FF8095;background:rgba(232,50,74,.15);}
+@media(max-width:768px){.sidebar{display:none;}.main-area{padding:16px 14px 80px;}.mobile-nav{display:flex;}.toast-c{bottom:80px;right:16px;left:16px;}.toast{max-width:100%;}}
 </style>
 </head>
 <body>
@@ -900,7 +909,7 @@ function renderGrid(){
     dates.forEach(d=>{
       const dkey=dk(d);const td=document.createElement('td');td.style.padding='3px 4px';
       if(selR===0){
-        const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-wrap:wrap;gap:2px;min-height:44px;padding:2px;';
+        const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;gap:3px;min-height:44px;padding:2px;';
         const fR=[];
         ROOMS.forEach(r=>{
           const {state,bk}=slotState(dkey,h,r);
@@ -908,13 +917,13 @@ function renderGrid(){
           if(state==='free'){fR.push(r);return;}
           const el=document.createElement('div');
           if(state==='ongoing'){
-            el.className='sl ongoing';el.style='flex:1;min-width:0;';
+            el.className='sl ongoing';el.style='width:100%;';
             el.innerHTML=`<div class="sl-st">🔴 En curso</div><div class="sl-nm">${sN(bk.userName)}</div>`;
           } else {
             const pc=getProfColor(bk.userName);
             const isMe=state==='mine';
             el.className='sl prof'+(((isMe&&hasPerm('cancel'))||(!isMe&&hasPerm('cancelAll')))?' clickable':'');
-            el.style=`flex:1;min-width:0;background:${pc.bg};border:1.5px solid ${pc.bd};`;
+            el.style=`width:100%;background:${pc.bg};border:1.5px solid ${pc.bd};`;
             el.style.setProperty('--prof-color',pc.lft);
             el.innerHTML=`<div class="sl-st" style="color:${pc.txt}">${isMe?'✓ Mío':'C'+r}</div><div class="sl-nm" style="color:${pc.txt}">${sN(bk.userName)}</div>`;
             if(isMe&&hasPerm('cancel')){el.onclick=()=>openCancel(bk.id);}
@@ -925,6 +934,7 @@ function renderGrid(){
         if(fR.length>0){
           const fc=document.createElement('div');fc.className='fchip';fc.style='flex:1;min-width:40px;';
           fc.innerHTML=`<div class="fchip-n">${fR.length}</div><div class="fchip-l">libre${fR.length>1?'s':''}</div>`;
+          fc.style='width:100%;';
           if(hasPerm('book'))fc.onclick=()=>openBook(dkey,h,fR);else fc.style.cursor='default';
           wrap.appendChild(fc);
         }
@@ -1355,6 +1365,22 @@ window.toast=(msg,type='inf')=>{
   const t=document.createElement('div');t.className=`toast ${type}`;
   t.innerHTML=`<span>${icons[type]}</span><span>${msg}</span>`;w.appendChild(t);
   setTimeout(()=>{t.style.transition='all .3s';t.style.opacity='0';t.style.transform='translateX(18px)';setTimeout(()=>t.remove(),300);},3000);
+};
+</script>
+
+<nav class="mobile-nav" id="mobileNav">
+  <button class="mn-item active" id="mni-grid" onclick="sv('gridView',this); setMNI(this)"><span class="mn-ico">▦</span><span class="mn-lbl">Agenda</span></button>
+  <button class="mn-item" id="mni-rooms" onclick="sv('roomsView',this); setMNI(this)"><span class="mn-ico">◫</span><span class="mn-lbl">Consultorios</span></button>
+  <button class="mn-item" id="mni-my" onclick="sv('myView',this); setMNI(this)"><span class="mn-ico">◻</span><span class="mn-lbl">Mis turnos</span></button>
+  <button class="mn-item admin-only" id="mni-metrics" onclick="sv('metricsView',this); setMNI(this)"><span class="mn-ico">◈</span><span class="mn-lbl">Métricas</span></button>
+  <button class="mn-item admin-only" id="mni-panel" onclick="sv('panelView',this); setMNI(this)"><span class="mn-ico">⊙</span><span class="mn-lbl">Panel</span></button>
+  <button class="mn-item admin-only" id="mni-blocks" onclick="sv('blocksView',this); setMNI(this)"><span class="mn-ico">🔒</span><span class="mn-lbl">Bloqueos</span></button>
+  <button class="mn-item mn-logout" onclick="doLogout()"><span class="mn-ico">✕</span><span class="mn-lbl">Salir</span></button>
+</nav>
+<script>
+window.setMNI=function(btn){
+  document.querySelectorAll('.mn-item').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
 };
 </script>
 </body>
