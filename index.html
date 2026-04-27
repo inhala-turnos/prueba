@@ -547,7 +547,7 @@ body{font-family:'Manrope',sans-serif;color:var(--ink);background:var(--bg);}
     <div class="view" id="roomsView">
       <div class="pg-hd">
         <div><div class="pg-title">Vista por Consultorio</div><div class="pg-sub">Disponibilidad del día</div></div>
-        <div class="pg-acts"><input type="date" class="filter-select" id="rvDate" onchange="renderRooms()"></div>
+        <div class="pg-acts"><input type="date" class="filter-select" id="rvDate" onchange="renderRooms()" onfocus="if(!this.value)this.value=new Date().toISOString().slice(0,10)"></div>
       </div>
       <div class="rooms-g" id="roomsGrid"></div>
     </div>
@@ -784,6 +784,9 @@ window.doLogin=async()=>{
 };
 document.getElementById('lPass').addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
 document.getElementById('lUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('lPass').focus();});
+function clearLoginErr(){const err=document.getElementById('loginErr');err.style.display='none';err.style.cssText='';}
+document.getElementById('lUser').addEventListener('input',clearLoginErr);
+document.getElementById('lPass').addEventListener('input',clearLoginErr);
 document.getElementById('togglePassBtn').addEventListener('click',()=>{
   const input=document.getElementById('lPass');const btn=document.getElementById('togglePassBtn');
   const show=input.type==='password';input.type=show?'text':'password';btn.textContent=show?'Ocultar':'Ver';btn.setAttribute('aria-label',show?'Ocultar contraseña':'Mostrar contraseña');
@@ -792,8 +795,15 @@ document.getElementById('resetPassBtn').addEventListener('click',async()=>{
   const email=document.getElementById('lUser').value.trim();
   const err=document.getElementById('loginErr');const msg=document.getElementById('loginErrMsg');
   if(!email){err.style.display='flex';msg.textContent='Escribí tu email para recuperar la contraseña.';return;}
-  try{await sendPasswordResetEmail(auth,email);err.style.display='flex';msg.textContent='Te enviamos un correo para restablecer la contraseña.';}
-  catch(e){err.style.display='flex';msg.textContent='No se pudo enviar el recupero: '+e.message;}
+  try{
+    await sendPasswordResetEmail(auth,email);
+    err.style.cssText='display:flex;background:rgba(14,168,117,.15);border-color:rgba(14,168,117,.3);color:#0EA875;';
+    msg.textContent='Te enviamos un correo para restablecer la contraseña.';
+  }catch(e){
+    err.style.cssText='';
+    err.style.display='flex';
+    msg.textContent='No se pudo enviar el recupero: '+e.message;
+  }
 });
 function handleFirebaseError(err,ctx){console.error('Firebase error',ctx,err);toast(`Error de Firebase en ${ctx}: ${err.message||err.code}`,'err');}
 function updateOnlineBanner(){const b=document.getElementById('offlineBanner');if(!navigator.onLine)b.classList.add('show');else b.classList.remove('show');}
@@ -847,7 +857,10 @@ async function startApp(){
   av.className='sb-avatar '+AV[avI(CUProfile.name)];
   document.getElementById('sbName').textContent=CUProfile.name||CUProfile.email;
   document.getElementById('sbRole').textContent=CUProfile.role==='admin'?'Administrador':'Profesional';
-  document.querySelectorAll('.admin-only').forEach(el=>el.style.display=CUProfile.role==='admin'?'':'none');
+  document.querySelectorAll('.admin-only').forEach(el=>{
+    if(CUProfile.role==='admin'){el.classList.add('admin-visible');el.style.display='';}
+    else{el.style.display='none';}
+  });
   wOff=0;
   document.getElementById('rvDate').value=dk(new Date());
   buildChips();
@@ -942,6 +955,7 @@ function checkReminder(){
 }
 window.cancelFromReminder=()=>{if(reminderBkId){openCancel(reminderBkId);document.getElementById('reminderBanner').classList.remove('show');}};
 
+
 // ── SLOT STATE ──
 function curHourKey(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':00';}
 function slotState(dkey,h,r){
@@ -1015,6 +1029,13 @@ function renderGrid(){
           fc.style='width:100%;';
           if(hasPerm('book'))fc.onclick=()=>openBook(dkey,h,fR);else fc.style.cursor='default';
           wrap.appendChild(fc);
+        }
+        // Si no hay nada en el wrap (todos bloqueados y sin bookings), mostrar vacío mínimo
+        if(!wrap.children.length){
+          const empty=document.createElement('div');
+          empty.style.cssText='min-height:44px;border-radius:9px;background:#F1F5F9;border:1.5px solid #CBD5E1;display:flex;align-items:center;justify-content:center;';
+          empty.innerHTML='<span style="font-size:10px;color:#94A3B8;font-weight:700">Bloqueado</span>';
+          wrap.appendChild(empty);
         }
         td.appendChild(wrap);
       }else{
@@ -1097,7 +1118,8 @@ function renderMy(){
     if(isOngoing) statusBadge='<span class="bk-status-pill bk-ongoing-pill">🔴 En curso</span>';
     else if(isPastB) statusBadge='<span class="bk-status-pill bk-past-pill">Pasado</span>';
     else statusBadge='<span class="bk-status-pill bk-future-pill">Próximo</span>';
-    const canCancel=hasPerm('cancel')&&!isPastB&&!isOngoing;
+    const isOngoingCheck=b.date===today&&b.hour===curHourKey();
+  const canCancel=hasPerm('cancel')&&!isPastB&&!isOngoingCheck;
     item.innerHTML=`
       <div class="bk-badge" style="background:${pc.lft}">C${b.room}</div>
       <div class="bk-flex">
@@ -1192,7 +1214,13 @@ function _filterBks(){
     list.appendChild(row);
   });
 }
-window.panelDelBk=async id=>{try{await updateDoc(doc(db,'bookings',id),{status:'cancelled',cancelled:true,cancelledAt:serverTimestamp(),cancelledBy:CU?.uid||null,cancelledByName:CUProfile?.name||CU?.email||'sistema'});toast('Turno eliminado','ok');}catch(e){try{await deleteDoc(doc(db,'bookings',id));toast('Turno eliminado','ok');}catch(err){toast('No se pudo eliminar el turno','err');console.error(err);}}};
+window.panelDelBk=async id=>{
+  const bk=findBookingById(id);if(!bk)return;
+  const d=new Date(bk.date+'T12:00:00');
+  const confirmed=window.confirm(`¿Cancelar turno de ${sN(bk.userName)} — C${bk.room} ${bk.hour} hs, ${d.getDate()}/${d.getMonth()+1}?`);
+  if(!confirmed)return;
+  try{await updateDoc(doc(db,'bookings',id),{status:'cancelled',cancelled:true,cancelledAt:serverTimestamp(),cancelledBy:CU?.uid||null,cancelledByName:CUProfile?.name||CU?.email||'sistema'});toast('Turno cancelado','ok');}catch(e){try{await deleteDoc(doc(db,'bookings',id));toast('Turno cancelado','ok');}catch(err){toast('No se pudo cancelar el turno','err');console.error(err);}}
+};
 
 // ── BLOQUEOS ──
 window.openBlockModal=()=>{
@@ -1209,7 +1237,7 @@ window.openBlockModal=()=>{
 window.blkDateSync=()=>{
   const start=document.getElementById('blkDate').value;
   const end=document.getElementById('blkDateEnd').value;
-  if(end<start)document.getElementById('blkDateEnd').value=start;
+  if(end&&end<start)document.getElementById('blkDateEnd').value=start;
 };
 window.toggleBlkType=()=>{
   document.getElementById('blkHourGroup').style.display=document.getElementById('blkType').value==='slot'?'block':'none';
@@ -1261,7 +1289,11 @@ function renderBlocks(){
     list.appendChild(row);
   });
 }
-window.deleteBlock=async id=>{await deleteDoc(doc(db,'blocks',id));toast('Bloqueo eliminado','ok');};
+window.deleteBlock=async id=>{
+  if(!window.confirm('¿Eliminar este bloqueo?'))return;
+  try{await deleteDoc(doc(db,'blocks',id));toast('Bloqueo eliminado ✓','ok');}
+  catch(e){toast('No se pudo eliminar el bloqueo','err');console.error(e);}
+};
 
 // ── MÉTRICAS ──
 window.setMP=(p,btn)=>{metP=p;document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderMetrics();};
@@ -1327,11 +1359,11 @@ window.confirmBook=async()=>{
     const room=parseInt(document.getElementById('bookRoomSel').value);
     if(!room){toast('Seleccioná un consultorio','err');return;}
     const dup=activeBks().find(b=>b.date===pBook.date&&b.hour===pBook.hour&&b.room===room);
-    if(dup){toast('Ese horario ya fue reservado','err');closeOv('bookOv');pBook=null;return;}
+    if(dup){toast('Ese horario acaba de ser reservado por otro profesional','warn');closeOv('bookOv');pBook=null;renderGrid();return;}
     await addDoc(collection(db,'bookings'),{
       date:pBook.date,hour:pBook.hour,room,
       userId:CU.uid,userName:CUProfile.name||CUProfile.email,
-      locked:false,paid:false,createdAt:serverTimestamp()
+      status:'active',locked:false,paid:false,createdAt:serverTimestamp()
     });
     closeOv('bookOv');pBook=null;toast(`Consultorio ${room} reservado ✓`,'ok');
   }catch(e){
@@ -1348,8 +1380,10 @@ function openCancel(id){
   const bk=findBookingById(id);if(!bk)return;
   const mine=bk.userId===CU.uid;
   if((mine&&!hasPerm('cancel'))||(!mine&&!hasPerm('cancelAll'))){toast('Sin permiso','err');return;}
+  if(bk.date===todK()&&bk.hour===curHourKey()){toast('No se puede cancelar un turno en curso','err');return;}
   pCancel=id;const d=new Date(bk.date+'T12:00:00');
-  document.getElementById('cancelSub').textContent=`Consultorio ${bk.room} — ${bk.hour} hs — ${DL[d.getDay()]} ${d.getDate()}/${d.getMonth()+1}`;
+  document.getElementById('cancelTtl').textContent='Cancelar turno';
+  document.getElementById('cancelSub').textContent=`Consultorio ${bk.room} — ${bk.hour} hs — ${DL[d.getDay()]} ${d.getDate()}/${d.getMonth()+1}${bk.userId!==CU.uid?' · '+sN(bk.userName):'·'}`;
   openOv('cancelOv');
 }
 window.confirmCancel=async()=>{
@@ -1482,7 +1516,8 @@ window.toast=(msg,type='inf')=>{
   const icons={ok:'✓',err:'✕',inf:'ℹ',warn:'⚠'};const w=document.getElementById('toastC');
   const t=document.createElement('div');t.className=`toast ${type}`;
   t.innerHTML=`<span>${icons[type]}</span><span>${msg}</span>`;w.appendChild(t);
-  setTimeout(()=>{t.style.transition='all .3s';t.style.opacity='0';t.style.transform='translateX(18px)';setTimeout(()=>t.remove(),300);},3000);
+  const dur=type==='err'?5000:type==='warn'?4000:3200;
+  setTimeout(()=>{t.style.transition='all .3s';t.style.opacity='0';t.style.transform='translateX(18px)';setTimeout(()=>t.remove(),300);},dur);
 };
 </script>
 
