@@ -25,12 +25,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- ═══════════════════════════════════════════════
-  CONFIGURACIÓN FIREBASE
-  La apiKey de Firebase en apps web no es secreta por sí sola.
-  La seguridad real debe estar en Firebase Auth, Firestore Rules,
-  Storage Rules, dominios autorizados y, para tareas administrativas
-  sensibles, Cloud Functions con Admin SDK.
-  No colocar secretos privados, service accounts ni tokens en este HTML.
+  PASO 1: Reemplazá estos valores con los de tu
+  proyecto en Firebase Console → Configuración del proyecto
 ═══════════════════════════════════════════════ -->
 <script>
 const FIREBASE_CONFIG = {
@@ -92,23 +88,13 @@ body{font-family:'Manrope',sans-serif;color:var(--ink);background:var(--bg);}
 .lf-label{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;}
 .lf-wrap{position:relative;}
 .lf-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;color:rgba(255,255,255,.3);pointer-events:none;}
-.lf-input{width:100%;padding:13px 44px 13px 42px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.1);border-radius:var(--r12);color:#fff;font-size:14px;font-family:'Manrope',sans-serif;outline:none;transition:border-color var(--t),background var(--t),box-shadow var(--t);}
+.lf-input{width:100%;padding:13px 14px 13px 42px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.1);border-radius:var(--r12);color:#fff;font-size:14px;font-family:'Manrope',sans-serif;outline:none;transition:border-color var(--t),background var(--t),box-shadow var(--t);}
 .lf-input::placeholder{color:rgba(255,255,255,.25);}
 .lf-input:focus{border-color:rgba(26,79,232,.7);background:rgba(255,255,255,.1);box-shadow:0 0 0 4px rgba(26,79,232,.15);}
 .btn-login{width:100%;margin-top:6px;padding:14px;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);color:#fff;border:none;border-radius:var(--rpill);font-size:14px;font-weight:800;font-family:'Manrope',sans-serif;letter-spacing:.5px;cursor:pointer;box-shadow:var(--sa);transition:transform var(--t),box-shadow var(--t);}
 .btn-login:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(26,79,232,.45);}
 .btn-login:disabled{opacity:.5;cursor:not-allowed;transform:none;}
 .login-footer{margin-top:24px;font-size:11px;color:rgba(255,255,255,.2);text-align:center;letter-spacing:.5px;}
-.pw-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;border:none;border-radius:8px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.72);cursor:pointer;font-size:12px;}
-.pw-toggle:hover{background:rgba(255,255,255,.16);color:#fff;}
-.login-link{margin-top:12px;background:transparent;border:none;color:rgba(255,255,255,.68);font-size:12px;font-weight:700;text-decoration:underline;cursor:pointer;font-family:'Manrope',sans-serif;}
-.login-link:hover{color:#fff;}
-.offline-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:950;background:var(--amber);color:#fff;padding:10px 16px;text-align:center;font-size:12px;font-weight:800;box-shadow:var(--s3);}
-.offline-banner.show{display:block;}
-.mobile-more-menu{display:none;position:fixed;right:10px;bottom:84px;background:var(--white);border:1px solid var(--border);border-radius:var(--r16);box-shadow:var(--s4);z-index:260;padding:8px;min-width:170px;}
-.mobile-more-menu.open{display:block;}
-.mobile-more-menu button{display:block;width:100%;padding:10px 12px;border:none;background:transparent;text-align:left;border-radius:10px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:800;color:var(--ink2);cursor:pointer;}
-.mobile-more-menu button:hover{background:var(--bg);}
 
 /* ── APP ── */
 #appScreen{display:none;min-height:100vh;background:var(--bg);}
@@ -429,11 +415,10 @@ body{font-family:'Manrope',sans-serif;color:var(--ink);background:var(--bg);}
 .mn-lbl{font-size:9px;font-weight:700;letter-spacing:.3px;white-space:nowrap;}
 .mn-logout .mn-ico{color:#C0A0A0;}
 .mn-logout .mn-ico svg{fill:#C0A0A0;}
-@media(max-width:768px){.mobile-secondary{display:none!important;}.sidebar{display:none;}.main-area{padding:16px 14px 80px;}.mobile-nav{display:flex;}.toast-c{bottom:80px;right:16px;left:16px;}.toast{max-width:100%;}}
+@media(max-width:768px){.sidebar{display:none;}.main-area{padding:16px 14px 80px;}.mobile-nav{display:flex;}.toast-c{bottom:80px;right:16px;left:16px;}.toast{max-width:100%;}}
 </style>
 </head>
 <body>
-<div id="offlineBanner" class="offline-banner" role="status" aria-live="polite">Sin conexión. Los cambios pueden no guardarse.</div>
 
 <!-- LOADING -->
 <div id="loadingScreen">
@@ -451,15 +436,14 @@ body{font-family:'Manrope',sans-serif;color:var(--ink);background:var(--bg);}
       <div class="login-card-label">Acceso al sistema</div>
       <div class="login-err" id="loginErr"><span>⚠</span><span id="loginErrMsg">Credenciales incorrectas.</span></div>
       <div class="lf-group">
-        <label class="lf-label" for="lUser">Email</label>
-        <div class="lf-wrap"><span class="lf-ico" aria-hidden="true">◎</span><input class="lf-input" type="email" id="lUser" placeholder="tu@email.com" autocomplete="email"></div>
+        <label class="lf-label">Email</label>
+        <div class="lf-wrap"><span class="lf-ico">◎</span><input class="lf-input" type="email" id="lUser" placeholder="tu@email.com" autocomplete="email"></div>
       </div>
       <div class="lf-group">
-        <label class="lf-label" for="lPass">Contraseña</label>
-        <div class="lf-wrap"><span class="lf-ico" aria-hidden="true">◈</span><input class="lf-input" type="password" id="lPass" placeholder="••••••••••" autocomplete="current-password"><button type="button" class="pw-toggle" id="togglePassBtn" aria-label="Mostrar contraseña">Ver</button></div>
+        <label class="lf-label">Contraseña</label>
+        <div class="lf-wrap"><span class="lf-ico">◈</span><input class="lf-input" type="password" id="lPass" placeholder="••••••••••" autocomplete="current-password"></div>
       </div>
       <button class="btn-login" id="loginBtn" onclick="doLogin()">INGRESAR</button>
-      <button type="button" class="login-link" id="resetPassBtn">Olvidé mi contraseña</button>
     </div>
     <div class="login-footer">INHALATURNOS · Sistema de gestión de consultorios</div>
   </div>
@@ -470,7 +454,7 @@ body{font-family:'Manrope',sans-serif;color:var(--ink);background:var(--bg);}
  <div class="app-layout">
   <aside class="sidebar" id="sidebar">
     <!-- Tab flotante de toggle -->
-    <button class="sb-toggle" id="collapseBtn" onclick="toggleSidebar()" title="Expandir / contraer" aria-label="Expandir o contraer menú lateral">
+    <button class="sb-toggle" id="collapseBtn" onclick="toggleSidebar()" title="Expandir / contraer">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M15 18l-6-6 6-6"/>
       </svg>
@@ -503,7 +487,7 @@ body{font-family:'Manrope',sans-serif;color:var(--ink);background:var(--bg);}
       <div class="sb-user">
         <div class="sb-avatar" id="sbAv">?</div>
         <div class="sb-uinfo"><div class="sb-uname" id="sbName">—</div><div class="sb-urole" id="sbRole">—</div></div>
-        <button class="sb-logout" onclick="doLogout()" title="Salir" aria-label="Cerrar sesión">✕</button>
+        <button class="sb-logout" onclick="doLogout()" title="Salir">✕</button>
       </div>
     </div>
     </div>
@@ -534,9 +518,9 @@ body{font-family:'Manrope',sans-serif;color:var(--ink);background:var(--bg);}
       </div>
       <div class="week-bar">
         <div class="wk-nav">
-          <button class="btn-nav" onclick="chW(-1)" aria-label="Semana anterior">‹</button>
+          <button class="btn-nav" onclick="chW(-1)">‹</button>
           <button class="btn-today" onclick="goToday()">Hoy</button>
-          <button class="btn-nav" onclick="chW(1)" aria-label="Semana siguiente">›</button>
+          <button class="btn-nav" onclick="chW(1)">›</button>
           <span class="wk-range" id="wkRange"></span>
         </div>
       </div>
@@ -547,7 +531,7 @@ body{font-family:'Manrope',sans-serif;color:var(--ink);background:var(--bg);}
     <div class="view" id="roomsView">
       <div class="pg-hd">
         <div><div class="pg-title">Vista por Consultorio</div><div class="pg-sub">Disponibilidad del día</div></div>
-        <div class="pg-acts"><input type="date" class="filter-select" id="rvDate" onchange="renderRooms()" onfocus="if(!this.value)this.value=new Date().toISOString().slice(0,10)"></div>
+        <div class="pg-acts"><input type="date" class="filter-select" id="rvDate" onchange="renderRooms()"></div>
       </div>
       <div class="rooms-g" id="roomsGrid"></div>
     </div>
@@ -637,17 +621,17 @@ body{font-family:'Manrope',sans-serif;color:var(--ink);background:var(--bg);}
 
 <!-- MODALS -->
 <div class="overlay" id="bookOv">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="bookTtl" aria-describedby="bookSub" tabindex="-1"><div class="modal-ico mie">📅</div><div class="modal-ttl" id="bookTtl">Reservar horario</div><div class="modal-sub" id="bookSub"></div>
+  <div class="modal"><div class="modal-ico mie">📅</div><div class="modal-ttl" id="bookTtl">Reservar horario</div><div class="modal-sub" id="bookSub"></div>
   <div class="mf-group"><label class="mf-label">Consultorio</label><select class="mf-select" id="bookRoomSel"></select></div>
   <div class="book-notice">💳 Abonar por transferencia al alias <strong>inhalaconsultorios</strong></div>
   <div class="modal-acts"><button class="btn-mc" onclick="closeOv('bookOv')">Cancelar</button><button class="btn-mok bm-green" onclick="confirmBook()">Confirmar</button></div></div>
 </div>
 <div class="overlay" id="cancelOv">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cancelTtl" aria-describedby="cancelSub" tabindex="-1"><div class="modal-ico mir">🗑</div><div class="modal-ttl" id="cancelTtl">Cancelar turno</div><div class="modal-sub" id="cancelSub"></div>
+  <div class="modal"><div class="modal-ico mir">🗑</div><div class="modal-ttl">Cancelar turno</div><div class="modal-sub" id="cancelSub"></div>
   <div class="modal-acts"><button class="btn-mc" onclick="closeOv('cancelOv')">Mantener</button><button class="btn-mok bm-red" onclick="confirmCancel()">Sí, cancelar</button></div></div>
 </div>
 <div class="overlay" id="blockOv">
-  <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="blockTtl" aria-describedby="blockDesc" tabindex="-1"><div class="modal-ico mio">🔒</div><div class="modal-ttl" id="blockTtl">Nuevo bloqueo</div><div class="modal-sub" id="blockDesc">Bloqueá un día completo o un horario específico. Podés seleccionar un rango de fechas.</div>
+  <div class="modal modal-lg"><div class="modal-ico mio">🔒</div><div class="modal-ttl">Nuevo bloqueo</div><div class="modal-sub">Bloqueá un día completo o un horario específico. Podés seleccionar un rango de fechas.</div>
   <div class="mf-group"><label class="mf-label">Tipo</label><select class="mf-select" id="blkType" onchange="toggleBlkType()"><option value="day">Día completo</option><option value="slot">Horario específico</option></select></div>
   <div class="blk-date-range">
     <div class="mf-group"><label class="mf-label">Desde</label><input class="mf-input" type="date" id="blkDate" onchange="blkDateSync()"></div>
@@ -661,7 +645,7 @@ body{font-family:'Manrope',sans-serif;color:var(--ink);background:var(--bg);}
   <div class="modal-acts"><button class="btn-mc" onclick="closeOv('blockOv')">Cancelar</button><button class="btn-mok bm-amber" onclick="confirmBlock()">Bloquear</button></div></div>
 </div>
 <div class="overlay" id="userOv">
-  <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="userMTtl" aria-describedby="userDesc" tabindex="-1"><div class="modal-ico mia">👤</div><div class="modal-ttl" id="userMTtl">Nuevo profesional</div><div class="modal-sub" id="userDesc">Completá los datos y asigná permisos</div>
+  <div class="modal modal-lg"><div class="modal-ico mia">👤</div><div class="modal-ttl" id="userMTtl">Nuevo profesional</div><div class="modal-sub">Completá los datos y asigná permisos</div>
   <input type="hidden" id="eUid">
   <div class="mf-2col">
     <div class="mf-group"><label class="mf-label">Nombre</label><input class="mf-input" id="uName" placeholder="Dr. Juan Pérez"></div>
@@ -680,72 +664,27 @@ body{font-family:'Manrope',sans-serif;color:var(--ink);background:var(--bg);}
   <div class="modal-acts"><button class="btn-mc" onclick="closeOv('userOv')">Cancelar</button><button class="btn-mok bm-blue" onclick="saveUser()">Guardar</button></div></div>
 </div>
 <div class="overlay" id="delUserOv">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="delUserTtl" aria-describedby="delUserSub" tabindex="-1"><div class="modal-ico mir">⚠️</div><div class="modal-ttl" id="delUserTtl">Eliminar profesional</div><div class="modal-sub" id="delUserSub"></div>
+  <div class="modal"><div class="modal-ico mir">⚠️</div><div class="modal-ttl">Eliminar profesional</div><div class="modal-sub" id="delUserSub"></div>
   <input type="hidden" id="dUid">
   <div class="modal-acts"><button class="btn-mc" onclick="closeOv('delUserOv')">Cancelar</button><button class="btn-mok bm-red" onclick="confirmDelUser()">Eliminar</button></div></div>
 </div>
 <div class="toast-c" id="toastC"></div>
 
 <!-- Firebase SDK -->
-<!-- Firebase SDK (compat) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script>
-// ── FIREBASE INIT (compat SDK) ──
-const _app = firebase.initializeApp(FIREBASE_CONFIG);
-const auth = firebase.auth();
-const db   = firebase.firestore();
-
-// Shims so the app logic (written for modular SDK) works with compat SDK
-function initializeApp(cfg, name) { 
-  try { return firebase.app(name); } catch(e) { return firebase.initializeApp(cfg, name); }
-}
-function deleteApp(app) { return app.delete(); }
-function getAuth(app) { return app ? app.auth() : auth; }
-function getFirestore() { return db; }
-function collection(dbOrRef, col) { return dbOrRef.collection(col); }
-function doc(dbOrRef, col, id) { return dbOrRef.collection(col).doc(id); }
-async function getDocs(q) { return q.get(); }
-async function getDoc(ref) { return ref.get(); }
-async function setDoc(ref, data, opts) { return opts && opts.merge ? ref.set(data, {merge:true}) : ref.set(data); }
-async function addDoc(colRef, data) { return colRef.add(data); }
-async function deleteDoc(ref) { return ref.delete(); }
-async function updateDoc(ref, data) { return ref.update(data); }
-function onSnapshot(ref, cb) {
-  return ref.onSnapshot(snap => {
-    // Compat SDK collection snapshots already have .docs
-    // For document snapshots, wrap in a fake collection-like object
-    if (typeof snap.docs === 'undefined') {
-      const normalized = { docs: [snap], forEach: (fn) => fn(snap) };
-      cb(normalized);
-    } else {
-      cb(snap);
-    }
-  });
-}
-async function signInWithEmailAndPassword(a, e, p) { return a.signInWithEmailAndPassword(e, p); }
-async function signOut(a) { return (a||auth).signOut(); }
-function onAuthStateChanged(a, cb) { return (a||auth).onAuthStateChanged(cb); }
-async function createUserWithEmailAndPassword(a, e, p) { return a.createUserWithEmailAndPassword(e, p); }
-async function sendPasswordResetEmail(a, e) { return (a||auth).sendPasswordResetEmail(e); }
-function serverTimestamp() { return firebase.firestore.FieldValue.serverTimestamp(); }
-// query/where not needed since we use collection directly
-</script>
-<script>
-
-         createUserWithEmailAndPassword, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+<script type="module">
+import { initializeApp, deleteApp }                   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword,
+         signOut, onAuthStateChanged,
+         createUserWithEmailAndPassword }             from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, doc,
          getDocs, getDoc, setDoc, addDoc,
          deleteDoc, updateDoc, onSnapshot,
+         query, where, serverTimestamp }              from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 // ── INIT ──
 const app  = initializeApp(FIREBASE_CONFIG);
 const auth = getAuth(app);
 const db   = getFirestore(app);
-
-/* Seguridad: esta app cliente no decide privilegios críticos por sí sola.
-   Firestore Rules deben validar roles/permisos contra /users/{uid}.
-   Borrar usuarios de Firebase Auth debe hacerse con Cloud Functions + Admin SDK. */
 
 // ── CONSTANTS ──
 const HOURS=['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
@@ -769,7 +708,7 @@ const PROF_SLOT_COLORS=[
 
 // ── STATE ──
 let CU=null, CUProfile=null, wOff=0, selR=0;
-let pBook=null, pCancel=null, metP='week', reminderBkId=null, bookBusy=false;
+let pBook=null, pCancel=null, metP='week', reminderBkId=null, reminderTimer=null;
 let allBks=[], allUsers=[], allBlocks=[];
 let unsubBks=null, unsubUsers=null, unsubBlocks=null;
 
@@ -783,15 +722,15 @@ const activeBks=()=>allBks.filter(b=>!isBookingCancelled(b));
 const findBookingById=(id,{includeCancelled=false}={})=>(includeCancelled?allBks:activeBks()).find(b=>b.id===id);
 const hasPerm=p=>{if(!CUProfile)return false;if(CUProfile.role==='admin')return true;return Array.isArray(CUProfile.perms)&&CUProfile.perms.includes(p);};
 const avI=n=>{let h=0;for(const c of(n||''))h=(h*31+c.charCodeAt(0))&0xffff;return h%8;};
-function pad2(n){return String(n).padStart(2,'0');}
-const dk=d=>`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
-const parseLocalDate=s=>{const [y,m,d]=(s||'').split('-').map(Number);return new Date(y,(m||1)-1,d||1,12,0,0,0);};
+const dk=d=>d.toISOString().split('T')[0];
 const todK=()=>dk(new Date());
-const sN=n=>{if(!n)return'';const p=n.split(' ');return p.length>2?p.slice(0,2).join(' '):n;};
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const jsStr=v=>String(v??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/[\r\n]/g,' ');
+const sN=n=>{if(!n)return'';const p=String(n).split(' ');return p.length>2?p.slice(0,2).join(' '):String(n);};
 const isToday=s=>s===todK();
-const cmpDateKey=(a,b)=>parseLocalDate(a).getTime()-parseLocalDate(b).getTime();
-const isPast=s=>cmpDateKey(s,todK())<0;
-const isFuture=s=>cmpDateKey(s,todK())>0;
+const isPast=s=>s<todK();
+const isFuture=s=>s>todK();
+const isPastSlot=(date,hour)=>new Date(date+'T'+hour+':00')<=new Date();
 const getProfColor=name=>PROF_SLOT_COLORS[avI(name||'')];
 const getWkKeys=()=>getWkDates(0).map(dk);
 const getMonthPfx=()=>{const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');};
@@ -825,41 +764,21 @@ window.doLogin=async()=>{
 };
 document.getElementById('lPass').addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
 document.getElementById('lUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('lPass').focus();});
-function clearLoginErr(){const err=document.getElementById('loginErr');err.style.display='none';err.style.cssText='';}
-document.getElementById('lUser').addEventListener('input',clearLoginErr);
-document.getElementById('lPass').addEventListener('input',clearLoginErr);
-document.getElementById('togglePassBtn').addEventListener('click',()=>{
-  const input=document.getElementById('lPass');const btn=document.getElementById('togglePassBtn');
-  const show=input.type==='password';input.type=show?'text':'password';btn.textContent=show?'Ocultar':'Ver';btn.setAttribute('aria-label',show?'Ocultar contraseña':'Mostrar contraseña');
-});
-document.getElementById('resetPassBtn').addEventListener('click',async()=>{
-  const email=document.getElementById('lUser').value.trim();
-  const err=document.getElementById('loginErr');const msg=document.getElementById('loginErrMsg');
-  if(!email){err.style.display='flex';msg.textContent='Escribí tu email para recuperar la contraseña.';return;}
-  try{
-    await sendPasswordResetEmail(auth,email);
-    err.style.cssText='display:flex;background:rgba(14,168,117,.15);border-color:rgba(14,168,117,.3);color:#0EA875;';
-    msg.textContent='Te enviamos un correo para restablecer la contraseña.';
-  }catch(e){
-    err.style.cssText='';
-    err.style.display='flex';
-    msg.textContent='No se pudo enviar el recupero: '+e.message;
-  }
-});
-function handleFirebaseError(err,ctx){console.error('Firebase error',ctx,err);toast(`Error de Firebase en ${ctx}: ${err.message||err.code}`,'err');}
-function updateOnlineBanner(){const b=document.getElementById('offlineBanner');if(!navigator.onLine)b.classList.add('show');else b.classList.remove('show');}
-window.addEventListener('offline',()=>{updateOnlineBanner();toast('Sin conexión. Los cambios pueden no guardarse.','warn');});
-window.addEventListener('online',()=>{updateOnlineBanner();toast('Conexión restablecida.','ok');});
-updateOnlineBanner();
 
-
+function stopRealtime(){
+  if(unsubBks){unsubBks();unsubBks=null;}
+  if(unsubUsers){unsubUsers();unsubUsers=null;}
+  if(unsubBlocks){unsubBlocks();unsubBlocks=null;}
+  if(reminderTimer){clearInterval(reminderTimer);reminderTimer=null;}
+}
 window.doLogout=async()=>{
-  if(unsubBks)unsubBks();if(unsubUsers)unsubUsers();if(unsubBlocks)unsubBlocks();
+  stopRealtime();
   await signOut(auth);
 };
 
 // ── AUTH STATE ──
 onAuthStateChanged(auth,async firebaseUser=>{
+  stopRealtime();
   document.getElementById('loadingScreen').style.display='none';
   if(!firebaseUser){
     CU=null;CUProfile=null;allBks=[];allUsers=[];allBlocks=[];
@@ -867,22 +786,18 @@ onAuthStateChanged(auth,async firebaseUser=>{
     document.getElementById('loginScreen').style.display='flex';
     document.getElementById('loginBtn').disabled=false;
     document.getElementById('loginBtn').textContent='INGRESAR';
+    document.getElementById('mobileNav').style.display='none';
     return;
   }
   CU=firebaseUser;
-  // Cargar perfil del usuario desde Firestore. Nunca asignar admin automáticamente.
+  // Cargar perfil del usuario desde Firestore
   const profileSnap=await getDoc(doc(db,'users',CU.uid));
-  const profileExists = typeof profileSnap.exists === 'function' ? profileSnap.exists() : profileSnap.exists;
-  if(!profileExists){
-    CUProfile={uid:CU.uid,email:CU.email,name:CU.email?.split('@')[0]||'Usuario',role:'user',perms:['book','cancel'],status:'pending',createdAt:serverTimestamp()};
-    await setDoc(doc(db,'users',CU.uid),CUProfile,{merge:true});
+  if(!profileSnap.exists()){
+    // Primer admin — crear perfil automáticamente
+    CUProfile={uid:CU.uid,email:CU.email,name:CU.email.split('@')[0],role:'admin',perms:['book','cancel','viewAll','cancelAll']};
+    await setDoc(doc(db,'users',CU.uid),CUProfile);
   }else{
     CUProfile={uid:CU.uid,...profileSnap.data()};
-  }
-  if(CUProfile.disabled===true||CUProfile.status==='disabled'){
-    await signOut(auth);
-    toast('Usuario deshabilitado. Contactá a administración.','err');
-    return;
   }
   startApp();
 });
@@ -890,6 +805,7 @@ onAuthStateChanged(auth,async firebaseUser=>{
 async function startApp(){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appScreen').style.display='block';
+  document.getElementById('mobileNav').style.display='';
   // Sidebar
   sbCollapsed=localStorage.getItem('it_sb')==='1';
   document.getElementById('sidebar').classList.toggle('collapsed',sbCollapsed);
@@ -899,10 +815,7 @@ async function startApp(){
   av.className='sb-avatar '+AV[avI(CUProfile.name)];
   document.getElementById('sbName').textContent=CUProfile.name||CUProfile.email;
   document.getElementById('sbRole').textContent=CUProfile.role==='admin'?'Administrador':'Profesional';
-  document.querySelectorAll('.admin-only').forEach(el=>{
-    if(CUProfile.role==='admin'){el.classList.add('admin-visible');el.style.display='';}
-    else{el.style.display='none';}
-  });
+  document.querySelectorAll('.admin-only').forEach(el=>el.style.display=CUProfile.role==='admin'?'':'none');
   wOff=0;
   document.getElementById('rvDate').value=dk(new Date());
   buildChips();
@@ -942,7 +855,7 @@ async function startApp(){
     });
   }
   sv('gridView',document.getElementById('sbn-grid'));
-  setInterval(()=>{lockExpiredBookings();checkReminder();},60000);
+  reminderTimer=setInterval(()=>{lockExpiredBookings();checkReminder();},60000);
 }
 
 function refreshActiveView(vid){
@@ -960,15 +873,8 @@ window.sv=(vid,btn)=>{
   refreshActiveView(vid);
 };
 
-// ── LOCK ──
-async function lockExpiredBookings(){
-  const now=new Date();
-  const toExpire=allBks.filter(b=>!isBookingCancelled(b)&&b.status!=='past'&&new Date(`${b.date}T${b.hour||'00:00'}:00`).getTime()+60*60*1000<now.getTime());
-  for(const b of toExpire){
-    try{await updateDoc(doc(db,'bookings',b.id),{status:'past',locked:true,endedAt:serverTimestamp()});}
-    catch(e){console.warn('No se pudo marcar reserva pasada',b.id,e);}
-  }
-}
+// ── LOCK ── (mantenido solo por compatibilidad con datos existentes)
+async function lockExpiredBookings(){}
 
 // ── REMINDER ──
 function checkReminder(){
@@ -997,7 +903,6 @@ function checkReminder(){
 }
 window.cancelFromReminder=()=>{if(reminderBkId){openCancel(reminderBkId);document.getElementById('reminderBanner').classList.remove('show');}};
 
-
 // ── SLOT STATE ──
 function curHourKey(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':00';}
 function slotState(dkey,h,r){
@@ -1008,7 +913,7 @@ function slotState(dkey,h,r){
   });
   if(isBlocked)return{state:'blkd',bk:null};
   const bk=activeBks().find(b=>b.date===dkey&&b.hour===h&&b.room===r);
-  if(!bk)return{state:'free',bk:null};
+  if(!bk)return isPastSlot(dkey,h)?{state:'past',bk:null}:{state:'free',bk:null};
   // En curso: es hoy y la hora coincide con la hora actual
   if(dkey===todK()&&h===curHourKey())return{state:'ongoing',bk};
   if(bk.userId===CU.uid)return{state:'mine',bk};
@@ -1026,7 +931,7 @@ function buildChips(){
 function setChip(btn){document.querySelectorAll('.rc').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
 
 // ── GRID ──
-window.renderGrid=function renderGrid(){
+function renderGrid(){
   const dates=getWkDates(wOff);const tk=todK();
   const d0=dates[0],d6=dates[6];
   const rangeStr=d0.getDate()+' '+MN[d0.getMonth()]+(d0.getMonth()!==d6.getMonth()||d0.getFullYear()!==d6.getFullYear()?'':'')+' — '+d6.getDate()+' '+MN[d6.getMonth()]+' '+d6.getFullYear();
@@ -1047,19 +952,19 @@ window.renderGrid=function renderGrid(){
         const fR=[];
         ROOMS.forEach(r=>{
           const {state,bk}=slotState(dkey,h,r);
-          if(state==='blkd')return;
+          if(state==='blkd'||state==='past')return;
           if(state==='free'){fR.push(r);return;}
           const el=document.createElement('div');
           if(state==='ongoing'){
             el.className='sl ongoing';el.style='width:100%;';
-            el.innerHTML=`<div class="sl-st">🔴 En curso</div><div class="sl-nm">${sN(bk.userName)}</div>`;
+            el.innerHTML=`<div class="sl-st">🔴 En curso</div><div class="sl-nm">${esc(sN(bk.userName))}</div>`;
           } else {
             const pc=getProfColor(bk.userName);
             const isMe=state==='mine';
             el.className='sl prof'+(((isMe&&hasPerm('cancel'))||(!isMe&&hasPerm('cancelAll')))?' clickable':'');
             el.style=`width:100%;background:${pc.bg};border:1.5px solid ${pc.bd};`;
             el.style.setProperty('--prof-color',pc.lft);
-            el.innerHTML=`<div class="sl-st" style="color:${pc.txt}">${isMe?'✓ Mío':'C'+r}</div><div class="sl-nm" style="color:${pc.txt}">${sN(bk.userName)}</div>`;
+            el.innerHTML=`<div class="sl-st" style="color:${pc.txt}">${isMe?'✓ Mío':'C'+r}</div><div class="sl-nm" style="color:${pc.txt}">${esc(sN(bk.userName))}</div>`;
             if(isMe&&hasPerm('cancel')){el.onclick=()=>openCancel(bk.id);}
             else if(!isMe&&hasPerm('cancelAll')){el.onclick=()=>openCancel(bk.id);}
           }
@@ -1072,26 +977,19 @@ window.renderGrid=function renderGrid(){
           if(hasPerm('book'))fc.onclick=()=>openBook(dkey,h,fR);else fc.style.cursor='default';
           wrap.appendChild(fc);
         }
-        // Si no hay nada en el wrap (todos bloqueados y sin bookings), mostrar vacío mínimo
-        if(!wrap.children.length){
-          const empty=document.createElement('div');
-          empty.style.cssText='min-height:44px;border-radius:9px;background:#F1F5F9;border:1.5px solid #CBD5E1;display:flex;align-items:center;justify-content:center;';
-          empty.innerHTML='<span style="font-size:10px;color:#94A3B8;font-weight:700">Bloqueado</span>';
-          wrap.appendChild(empty);
-        }
         td.appendChild(wrap);
       }else{
         const {state,bk}=slotState(dkey,h,selR);
         const el=document.createElement('div');
-        if(state==='blkd'){el.className='sl blkd';el.innerHTML='<div class="sl-st">Bloqueado</div>';}
+        if(state==='blkd'||state==='past'){el.className='sl blkd';el.innerHTML=`<div class="sl-st">${state==='past'?'No disponible':'Bloqueado'}</div>`;}
         else if(state==='free'){el.className='sl free';el.innerHTML='<div class="sl-st">Libre</div>';if(hasPerm('book'))el.onclick=()=>openBook(dkey,h,[selR]);else el.style.cursor='default';}
-        else if(state==='ongoing'){el.className='sl ongoing';el.innerHTML=`<div class="sl-st">🔴 En curso</div><div class="sl-nm">${sN(bk.userName)}</div>`;}
+        else if(state==='ongoing'){el.className='sl ongoing';el.innerHTML=`<div class="sl-st">🔴 En curso</div><div class="sl-nm">${esc(sN(bk.userName))}</div>`;}
         else{
           const pc=getProfColor(bk.userName);const isMe=state==='mine';
           el.className='sl prof'+(((isMe&&hasPerm('cancel'))||(!isMe&&hasPerm('cancelAll')))?' clickable':'');
           el.style=`background:${pc.bg};border:1.5px solid ${pc.bd};`;
           el.style.setProperty('--prof-color',pc.lft);
-          el.innerHTML=`<div class="sl-st" style="color:${pc.txt}">${isMe?'✓ Mi turno':'Ocupado'}</div><div class="sl-nm" style="color:${pc.txt}">${sN(bk.userName)}</div>`;
+          el.innerHTML=`<div class="sl-st" style="color:${pc.txt}">${isMe?'✓ Mi turno':'Ocupado'}</div><div class="sl-nm" style="color:${pc.txt}">${esc(sN(bk.userName))}</div>`;
           if(isMe&&hasPerm('cancel')){el.onclick=()=>openCancel(bk.id);}
           else if(!isMe&&hasPerm('cancelAll')){el.onclick=()=>openCancel(bk.id);}
         }
@@ -1107,7 +1005,7 @@ window.chW=d=>{wOff+=d;renderGrid();};
 window.goToday=()=>{wOff=0;renderGrid();};
 
 // ── ROOMS ──
-window.renderRooms=function renderRooms(){
+function renderRooms(){
   const dv=document.getElementById('rvDate').value;if(!dv)return;
   const grid=document.getElementById('roomsGrid');grid.innerHTML='';
   ROOMS.forEach(r=>{
@@ -1118,24 +1016,31 @@ window.renderRooms=function renderRooms(){
     const bd=card.querySelector(`#rcb${r}`);
     HOURS.forEach(h=>{
       const {state,bk}=slotState(dv,h,r);
-      const row=document.createElement('div');row.className='rsrow';row.innerHTML=`<span class="rs-time">${h}</span>`;
-      let chip;
-      if(state==='mine'||state==='taken'){
+      const row=document.createElement('div');row.className='rsrow';
+      let cls,lbl;
+      if(state==='blkd'){cls='blkd';lbl='🔒 Bloqueado';}
+      else if(state==='free'){cls='free';lbl='Disponible';}
+      else if(state==='past'){cls='blkd';lbl='No disponible';}
+      else if(state==='ongoing'){cls='ongoing';lbl='🔴 En curso — '+sN(bk.userName);}
+      else if(state==='mine'){
         const pc=getProfColor(bk.userName);
-        chip=document.createElement('span');chip.className='rs-chip';
-        chip.style.cssText=`background:${pc.bg};color:${pc.txt};border:1.5px solid ${pc.bd};${(state==='mine'&&hasPerm('cancel'))||(state==='taken'&&hasPerm('cancelAll'))?'cursor:pointer;':''}`;
-        chip.textContent=state==='mine'?'✓ Mi turno':sN(bk.userName);
-        chip.setAttribute('aria-label',`${state==='mine'?'Mi turno':'Reservado'} en consultorio ${r}, ${h}`);
-        if(state==='mine'&&hasPerm('cancel'))chip.onclick=()=>openCancel(bk.id);
-        if(state==='taken'&&hasPerm('cancelAll'))chip.onclick=()=>openCancel(bk.id);
-      }else{
-        const cls=state==='blkd'?'blkd':state==='free'?'free':'ongoing';
-        const lbl=state==='blkd'?'🔒 Bloqueado':state==='free'?'Disponible':'🔴 En curso — '+sN(bk.userName);
-        chip=document.createElement('span');chip.className='rs-chip '+cls;chip.textContent=lbl;
-        chip.setAttribute('aria-label',`${lbl} en consultorio ${r}, ${h}`);
-        if(state==='free'&&hasPerm('book'))chip.onclick=()=>openBook(dv,h,[r]);
+        const chip2=document.createElement('span');chip2.className='rs-chip';
+        chip2.style.cssText=`background:${pc.bg};color:${pc.txt};border:1.5px solid ${pc.bd};cursor:pointer;`;
+        chip2.textContent='✓ Mi turno';
+        if(hasPerm('cancel'))chip2.onclick=()=>openCancel(bk.id);
+        row.innerHTML=`<span class="rs-time">${h}</span>`;row.appendChild(chip2);bd.appendChild(row);return;
       }
-      row.appendChild(chip);bd.appendChild(row);
+      else if(state==='taken'){
+        const pc=getProfColor(bk.userName);
+        const chip2=document.createElement('span');chip2.className='rs-chip';
+        chip2.style.cssText=`background:${pc.bg};color:${pc.txt};border:1.5px solid ${pc.bd};`;
+        chip2.textContent=sN(bk.userName);
+        if(hasPerm('cancelAll'))chip2.onclick=()=>openCancel(bk.id);
+        row.innerHTML=`<span class="rs-time">${h}</span>`;row.appendChild(chip2);bd.appendChild(row);return;
+      }
+      const chip=document.createElement('span');chip.className='rs-chip '+cls;chip.textContent=lbl;
+      if(state==='free'&&hasPerm('book'))chip.onclick=()=>openBook(dv,h,[r]);
+      row.innerHTML=`<span class="rs-time">${h}</span>`;row.appendChild(chip);bd.appendChild(row);
     });
   });
 }
@@ -1160,8 +1065,7 @@ function renderMy(){
     if(isOngoing) statusBadge='<span class="bk-status-pill bk-ongoing-pill">🔴 En curso</span>';
     else if(isPastB) statusBadge='<span class="bk-status-pill bk-past-pill">Pasado</span>';
     else statusBadge='<span class="bk-status-pill bk-future-pill">Próximo</span>';
-    const isOngoingCheck=b.date===today&&b.hour===curHourKey();
-  const canCancel=hasPerm('cancel')&&!isPastB&&!isOngoingCheck;
+    const canCancel=hasPerm('cancel')&&!isPastB&&!isOngoing;
     item.innerHTML=`
       <div class="bk-badge" style="background:${pc.lft}">C${b.room}</div>
       <div class="bk-flex">
@@ -1221,11 +1125,11 @@ function _filterPros(){
     const myBks=activeBks().filter(b=>b.userId===u.uid);const future=myBks.filter(b=>!isPast(b.date)).length;
     const row=document.createElement('div');row.className='pp-row';
     row.innerHTML=`<div class="pp-av ${AV[avI(u.name||u.email)]}">${(u.name||u.email||'?').charAt(0).toUpperCase()}</div>
-      <div class="pp-info"><div class="pp-name">${u.name||u.email}</div>
-      <div class="pp-meta">${u.email} · <span class="pill ${u.role==='admin'?'p-adm':'p-usr'}" style="font-size:9px">${u.role==='admin'?'Admin':'Prof'}</span> · ${myBks.length} turno${myBks.length!==1?'s':''} (${future} próx.)</div></div>
+      <div class="pp-info"><div class="pp-name">${esc(u.name||u.email)}</div>
+      <div class="pp-meta">${esc(u.email)} · <span class="pill ${u.role==='admin'?'p-adm':'p-usr'}" style="font-size:9px">${u.role==='admin'?'Admin':'Prof'}</span> · ${myBks.length} turno${myBks.length!==1?'s':''} (${future} próx.)</div></div>
       <div class="pp-acts">
-        <button class="btn-sm bse" onclick="openEditUser('${u.uid}')">✏</button>
-        ${u.uid!==CU.uid?`<button class="btn-sm bsd" onclick="openDelUser('${u.uid}','${u.name||u.email}')">🗑</button>`:''}
+        <button class="btn-sm bse" onclick="openEditUser('${jsStr(u.uid)}')">✏</button>
+        ${u.uid!==CU.uid?`<button class="btn-sm bsd" onclick="openDelUser('${jsStr(u.uid)}','${jsStr(u.name||u.email)}')">🗑</button>`:''}
       </div>`;
     list.appendChild(row);
   });
@@ -1249,20 +1153,14 @@ function _filterBks(){
     const stLbl=isToday(b.date)?'Hoy':isPast(b.date)?'Pasado':'Próximo';
     const row=document.createElement('div');row.className='pr-row'+(mine?' pr-mine':'');
     row.innerHTML=`<div class="pr-av ${AV[avI(b.userName)]}">${(b.userName||'?').charAt(0).toUpperCase()}</div>
-      <div class="pr-info"><div class="pr-name">${sN(b.userName)}</div>
+      <div class="pr-info"><div class="pr-name">${esc(sN(b.userName))}</div>
       <div class="pr-detail">C${b.room} · ${b.hour} hs · ${d.getDate()} ${MN[d.getMonth()]} ${d.getFullYear()}</div></div>
       <div class="pr-status"><span class="pill ${stCls}">${stLbl}</span></div>
-      <button class="pr-del" onclick="panelDelBk('${b.id}')">✕</button>`;
+      <button class="pr-del" onclick="panelDelBk('${jsStr(b.id)}')">✕</button>`;
     list.appendChild(row);
   });
 }
-window.panelDelBk=async id=>{
-  const bk=findBookingById(id);if(!bk)return;
-  const d=new Date(bk.date+'T12:00:00');
-  const confirmed=window.confirm(`¿Cancelar turno de ${sN(bk.userName)} — C${bk.room} ${bk.hour} hs, ${d.getDate()}/${d.getMonth()+1}?`);
-  if(!confirmed)return;
-  try{await updateDoc(doc(db,'bookings',id),{status:'cancelled',cancelled:true,cancelledAt:serverTimestamp(),cancelledBy:CU?.uid||null,cancelledByName:CUProfile?.name||CU?.email||'sistema'});toast('Turno cancelado','ok');}catch(e){try{await deleteDoc(doc(db,'bookings',id));toast('Turno cancelado','ok');}catch(err){toast('No se pudo cancelar el turno','err');console.error(err);}}
-};
+window.panelDelBk=async id=>{try{await updateDoc(doc(db,'bookings',id),{status:'cancelled',cancelled:true,cancelledAt:serverTimestamp(),cancelledBy:CU?.uid||null,cancelledByName:CUProfile?.name||CU?.email||'sistema'});toast('Turno eliminado','ok');}catch(e){try{await deleteDoc(doc(db,'bookings',id));toast('Turno eliminado','ok');}catch(err){toast('No se pudo eliminar el turno','err');console.error(err);}}};
 
 // ── BLOQUEOS ──
 window.openBlockModal=()=>{
@@ -1279,7 +1177,7 @@ window.openBlockModal=()=>{
 window.blkDateSync=()=>{
   const start=document.getElementById('blkDate').value;
   const end=document.getElementById('blkDateEnd').value;
-  if(end&&end<start)document.getElementById('blkDateEnd').value=start;
+  if(end<start)document.getElementById('blkDateEnd').value=start;
 };
 window.toggleBlkType=()=>{
   document.getElementById('blkHourGroup').style.display=document.getElementById('blkType').value==='slot'?'block':'none';
@@ -1298,6 +1196,8 @@ window.confirmBlock=async()=>{
   const cur=new Date(dateStart+'T12:00:00');
   const end=new Date(dateEnd+'T12:00:00');
   while(cur<=end){dates.push(dk(new Date(cur)));cur.setDate(cur.getDate()+1);}
+  const conflicts=activeBks().filter(b=>dates.includes(b.date)&&(type==='day'||b.hour===hour)&&(room==='all'||String(b.room)===String(room)));
+  if(conflicts.length){toast(`No se puede bloquear: hay ${conflicts.length} turno${conflicts.length!==1?'s':''} activo${conflicts.length!==1?'s':''}`,'err');return;}
   let created=0;
   for(const date of dates){
     const dup=allBlocks.some(b=>b.date===date&&b.type===type&&(type==='day'?b.room===room:b.hour===hour&&b.room===room));
@@ -1309,14 +1209,14 @@ window.confirmBlock=async()=>{
   if(created===0)toast('Esos bloqueos ya existen','warn');
   else toast(`${created} bloqueo${created!==1?'s':''} creado${created!==1?'s':''} ✓`,'ok');
 };
-window.renderBlocks=function renderBlocks(){
+function renderBlocks(){
   if(CUProfile.role!=='admin')return;
   document.getElementById('blocksStats').innerHTML=`
     <div class="sc"><div class="sc-top"><div class="sc-lbl">Total bloqueos</div><div class="sc-ico io">🔒</div></div><div class="sc-val">${allBlocks.length}</div><div class="sc-sub">Activos</div></div>
     <div class="sc"><div class="sc-top"><div class="sc-lbl">Días</div><div class="sc-ico ia">📅</div></div><div class="sc-val">${allBlocks.filter(b=>b.type==='day').length}</div><div class="sc-sub">Completos</div></div>
     <div class="sc"><div class="sc-top"><div class="sc-lbl">Horarios</div><div class="sc-ico iv">⏰</div></div><div class="sc-val">${allBlocks.filter(b=>b.type==='slot').length}</div><div class="sc-sub">Específicos</div></div>`;
   const tf=document.getElementById('blkTypeF').value;const rf=document.getElementById('blkRoomF').value;
-  let filtered=allBlocks.filter(b=>(!tf||b.type===tf)&&(!rf||b.room===rf||rf==='all')).sort((a,b)=>a.date.localeCompare(b.date));
+  let filtered=allBlocks.filter(b=>(!tf||b.type===tf)&&(!rf||String(b.room)===rf)).sort((a,b)=>a.date.localeCompare(b.date));
   document.getElementById('blocksCountLbl').textContent=filtered.length+' bloqueo'+(filtered.length!==1?'s':'');
   const list=document.getElementById('blkList');list.innerHTML='';
   if(!filtered.length){list.innerHTML='<div class="empty" style="padding:28px 20px"><div class="empty-i">🔓</div><div class="empty-t">Sin bloqueos</div></div>';}
@@ -1326,16 +1226,12 @@ window.renderBlocks=function renderBlocks(){
     const roomLbl=b.room==='all'?'Todos los consultorios':('C'+b.room);
     row.innerHTML=`<div class="blk-ico">${b.type==='day'?'📅':'⏰'}</div>
       <div class="blk-info"><div class="blk-main">${d.getDate()} ${MN[d.getMonth()]} ${d.getFullYear()} — ${b.type==='day'?'Día completo':b.hour+' hs'}</div>
-      <div class="blk-sub">${roomLbl}${b.reason?' · '+b.reason:''}</div></div>
-      <button class="blk-del" onclick="deleteBlock('${b.id}')">✕</button>`;
+      <div class="blk-sub">${roomLbl}${b.reason?' - '+esc(b.reason):''}</div></div>
+      <button class="blk-del" onclick="deleteBlock('${jsStr(b.id)}')">✕</button>`;
     list.appendChild(row);
   });
 }
-window.deleteBlock=async id=>{
-  if(!window.confirm('¿Eliminar este bloqueo?'))return;
-  try{await deleteDoc(doc(db,'blocks',id));toast('Bloqueo eliminado ✓','ok');}
-  catch(e){toast('No se pudo eliminar el bloqueo','err');console.error(e);}
-};
+window.deleteBlock=async id=>{await deleteDoc(doc(db,'blocks',id));toast('Bloqueo eliminado','ok');};
 
 // ── MÉTRICAS ──
 window.setMP=(p,btn)=>{metP=p;document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderMetrics();};
@@ -1368,7 +1264,7 @@ function renderMetrics(){
   mg.innerHTML+=`<div class="mc sp2"><div class="mc-title"><div class="mc-ico ia">📊</div>Ocupación por consultorio</div><div class="bar-chart">${ROOMS.map((r,i)=>{const o=roomOcc.find(x=>x.r===r)||{n:0,pct:0};return`<div class="bar-row"><div class="bar-lbl">Consultorio ${r}</div><div class="bar-track"><div class="bar-fill" style="width:${o.pct}%;background:${RC_COLORS[i]}"></div></div><div class="bar-n">${o.n}</div><div class="bar-pct">${o.pct}%</div></div>`;}).join('')}</div></div>`;
   mg.innerHTML+=`<div class="mc"><div class="mc-title"><div class="mc-ico ie">◐</div>Ocupación hoy</div><div class="donut-wrap">${mkDonut(todBks.length,freeToday)}<div class="donut-leg"><div class="dl-item"><div class="dl-dot" style="background:var(--accent)"></div>Ocupados<span class="dl-val">${todBks.length}</span></div><div class="dl-item"><div class="dl-dot" style="background:var(--emerald)"></div>Libres<span class="dl-val">${freeToday}</span></div><div class="dl-item"><div class="dl-dot" style="background:var(--bg2)"></div>Total<span class="dl-val">${totalSlots}</span></div></div></div></div>`;
   mg.innerHTML+=`<div class="mc"><div class="mc-title"><div class="mc-ico io">⚡</div>Indicadores clave</div><div class="kpi-row"><div class="kpi"><div class="kpi-val">${avgPerDay}</div><div class="kpi-lbl">Turnos/día</div></div><div class="kpi"><div class="kpi-val">${busyHour?busyHour[0].slice(0,5):'—'}</div><div class="kpi-lbl">Hora top</div></div><div class="kpi"><div class="kpi-val" style="color:var(--accent)">C${topRoom?topRoom.r:'—'}</div><div class="kpi-lbl">Consul. top</div></div></div></div>`;
-  mg.innerHTML+=`<div class="mc"><div class="mc-title"><div class="mc-ico iv">🏆</div>Top profesionales</div><div class="top-list">${topPros.length?topPros.map((p,i)=>`<div class="top-item"><div class="top-rank ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i+1}</div><div class="top-nm">${sN(p.name)}</div><div class="top-cnt">${p.n}</div></div>`).join(''):'<div style="color:var(--ink4);font-size:13px;padding:10px 0">Sin datos</div>'}</div></div>`;
+  mg.innerHTML+=`<div class="mc"><div class="mc-title"><div class="mc-ico iv">🏆</div>Top profesionales</div><div class="top-list">${topPros.length?topPros.map((p,i)=>`<div class="top-item"><div class="top-rank ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i+1}</div><div class="top-nm">${esc(sN(p.name))}</div><div class="top-cnt">${p.n}</div></div>`).join(''):'<div style="color:var(--ink4);font-size:13px;padding:10px 0">Sin datos</div>'}</div></div>`;
   mg.innerHTML+=`<div class="mc sp2"><div class="mc-title"><div class="mc-ico io">🕐</div>Mapa de calor</div><div class="heatmap">${HOURS.map(h=>{const v=hourMap[h];const p=v/maxH;const cls=p===0?'hm0':p<.25?'hm1':p<.5?'hm2':p<.75?'hm3':'hm4';return`<div class="hmc ${cls}" title="${h}: ${v}">${h.slice(0,5)}</div>`;}).join('')}</div></div>`;
   mg.innerHTML+=`<div class="mc"><div class="mc-title"><div class="mc-ico ia">📆</div>Por día</div><div class="bar-chart">${DS.map(d=>`<div class="bar-row"><div class="bar-lbl">${d}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(dayMap[d]/maxDay*100)}%;background:var(--accent)"></div></div><div class="bar-n">${dayMap[d]}</div></div>`).join('')}</div></div>`;
 }
@@ -1379,8 +1275,9 @@ function mkDonut(occ,free){
 }
 
 // ── BOOK ──
-window.openBook=function openBook(date,hour,fR){
+function openBook(date,hour,fR){
   if(!hasPerm('book')){toast('Sin permiso para reservar','err');return;}
+  if(isPastSlot(date,hour)){toast('No se puede reservar un horario pasado','err');return;}
   // fR ya contiene solo consultorios libres (filtrados en renderGrid), verificar que sigue siendo válido
   if(!fR||fR.length===0){toast('Ese horario está bloqueado','err');return;}
   pBook={date,hour};const d=new Date(date+'T12:00:00');
@@ -1391,41 +1288,26 @@ window.openBook=function openBook(date,hour,fR){
   openOv('bookOv');
 }
 window.confirmBook=async()=>{
-  if(!pBook||bookBusy)return;
-  bookBusy=true;
-  const btn=document.querySelector('#bookOv .bm-green');
-  const originalText=btn?btn.textContent:'Confirmar';
-  if(btn){btn.disabled=true;btn.textContent='Reservando...';}
-  try{
-    if(!navigator.onLine){toast('Sin conexión. No se puede reservar ahora.','err');return;}
-    const room=parseInt(document.getElementById('bookRoomSel').value);
-    if(!room){toast('Seleccioná un consultorio','err');return;}
-    const dup=activeBks().find(b=>b.date===pBook.date&&b.hour===pBook.hour&&b.room===room);
-    if(dup){toast('Ese horario acaba de ser reservado por otro profesional','warn');closeOv('bookOv');pBook=null;renderGrid();return;}
-    await addDoc(collection(db,'bookings'),{
-      date:pBook.date,hour:pBook.hour,room,
-      userId:CU.uid,userName:CUProfile.name||CUProfile.email,
-      status:'active',locked:false,paid:false,createdAt:serverTimestamp()
-    });
-    closeOv('bookOv');pBook=null;toast(`Consultorio ${room} reservado ✓`,'ok');
-  }catch(e){
-    console.error('Error al reservar',e);
-    toast('No se pudo reservar. Revisá la conexión e intentá de nuevo.','err');
-  }finally{
-    bookBusy=false;
-    if(btn){btn.disabled=false;btn.textContent=originalText;}
-  }
+  if(!pBook)return;
+  if(isPastSlot(pBook.date,pBook.hour)){toast('No se puede reservar un horario pasado','err');closeOv('bookOv');pBook=null;return;}
+  const room=parseInt(document.getElementById('bookRoomSel').value);
+  const dup=activeBks().find(b=>b.date===pBook.date&&b.hour===pBook.hour&&b.room===room);
+  if(dup){toast('Ese horario ya fue reservado','err');closeOv('bookOv');return;}
+  await addDoc(collection(db,'bookings'),{
+    date:pBook.date,hour:pBook.hour,room,
+    userId:CU.uid,userName:CUProfile.name||CUProfile.email,
+    locked:false,paid:false,createdAt:serverTimestamp()
+  });
+  closeOv('bookOv');pBook=null;toast(`Consultorio ${room} reservado ✓`,'ok');
 };
 
 // ── CANCEL ──
-window.openCancel=function openCancel(id){
+function openCancel(id){
   const bk=findBookingById(id);if(!bk)return;
   const mine=bk.userId===CU.uid;
   if((mine&&!hasPerm('cancel'))||(!mine&&!hasPerm('cancelAll'))){toast('Sin permiso','err');return;}
-  if(bk.date===todK()&&bk.hour===curHourKey()){toast('No se puede cancelar un turno en curso','err');return;}
   pCancel=id;const d=new Date(bk.date+'T12:00:00');
-  document.getElementById('cancelTtl').textContent='Cancelar turno';
-  document.getElementById('cancelSub').textContent=`Consultorio ${bk.room} — ${bk.hour} hs — ${DL[d.getDay()]} ${d.getDate()}/${d.getMonth()+1}${bk.userId!==CU.uid?' · '+sN(bk.userName):'·'}`;
+  document.getElementById('cancelSub').textContent=`Consultorio ${bk.room} — ${bk.hour} hs — ${DL[d.getDay()]} ${d.getDate()}/${d.getMonth()+1}`;
   openOv('cancelOv');
 }
 window.confirmCancel=async()=>{
@@ -1494,13 +1376,18 @@ window.saveUser=async()=>{
     // Crear usuario en Firebase Auth + perfil en Firestore
     if(!pass){toast('Ingresá una contraseña','err');return;}
     try{
-      const secondaryApp=initializeApp(FIREBASE_CONFIG,'SecondaryAuthApp-'+Date.now());
+      const secondaryApp=initializeApp(FIREBASE_CONFIG,'userCreation-'+Date.now());
       const secondaryAuth=getAuth(secondaryApp);
-      const cred=await createUserWithEmailAndPassword(secondaryAuth,email,pass);
-      await setDoc(doc(db,'users',cred.user.uid),{name,email,role,perms,status:'active',disabled:false,createdAt:serverTimestamp(),createdBy:CU.uid});
-      await signOut(secondaryAuth);
-      await deleteApp(secondaryApp);
-      toast('Profesional creado ✓','ok');
+      try{
+        const cred=await createUserWithEmailAndPassword(secondaryAuth,email,pass);
+        await setDoc(doc(db,'users',cred.user.uid),{name,email,role,perms,createdAt:serverTimestamp()});
+        await signOut(secondaryAuth);
+        await deleteApp(secondaryApp);
+        toast('Profesional creado OK','ok');
+      }catch(err){
+        await deleteApp(secondaryApp).catch(()=>{});
+        throw err;
+      }
     }catch(e){
       toast('Error al crear usuario: '+e.message,'err');return;
     }
@@ -1509,19 +1396,17 @@ window.saveUser=async()=>{
 };
 window.openDelUser=(uid,name)=>{
   document.getElementById('dUid').value=uid;
-  document.getElementById('delUserSub').textContent=`¿Deshabilitás a "${name}"? Sus turnos activos se cancelarán. Para borrar su cuenta de Firebase Auth se requiere Cloud Function segura.`;
+  document.getElementById('delUserSub').textContent=`¿Eliminás a "${name}"? Sus reservas también se eliminarán.`;
   openOv('delUserOv');
 };
 window.confirmDelUser=async()=>{
   const uid=document.getElementById('dUid').value;
-  // Frontend no puede borrar cuentas de Firebase Auth de forma segura.
-  // Para eliminación total usar Cloud Function callable con Admin SDK.
+  // Eliminar reservas del usuario
   const userBks=activeBks().filter(b=>b.userId===uid);
-  for(const b of userBks){
-    await updateDoc(doc(db,'bookings',b.id),{status:'cancelled',cancelled:true,cancelledAt:serverTimestamp(),cancelledBy:CU.uid,reason:'Usuario deshabilitado'});
-  }
-  await updateDoc(doc(db,'users',uid),{disabled:true,status:'disabled',disabledAt:serverTimestamp(),disabledBy:CU.uid});
-  closeOv('delUserOv');toast('Perfil deshabilitado. La cuenta Auth requiere Cloud Function para borrado total.','warn');
+  for(const b of userBks)await deleteDoc(doc(db,'bookings',b.id));
+  // Eliminar perfil
+  await deleteDoc(doc(db,'users',uid));
+  closeOv('delUserOv');toast('Profesional eliminado','ok');
 };
 
 // ── EXPORT ──
@@ -1537,52 +1422,38 @@ window.exportCSV=()=>{
 };
 
 // ── OVERLAYS ──
-let lastFocusEl=null;
-function focusFirstInModal(ov){const f=ov.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');(f[0]||ov.querySelector('.modal')||ov).focus();}
-window.openOv=id=>{const ov=document.getElementById(id);lastFocusEl=document.activeElement;ov.classList.add('open');setTimeout(()=>focusFirstInModal(ov),0);};
-window.closeOv=id=>{const ov=document.getElementById(id);ov.classList.remove('open');if(lastFocusEl&&typeof lastFocusEl.focus==='function')lastFocusEl.focus();};
-document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)closeOv(this.id);}));
-document.addEventListener('keydown',e=>{
-  const ov=document.querySelector('.overlay.open');if(!ov)return;
-  if(e.key==='Escape'){e.preventDefault();closeOv(ov.id);return;}
-  if(e.key==='Tab'){
-    const f=[...ov.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter(el=>!el.disabled&&el.offsetParent!==null);
-    if(!f.length)return;const first=f[0],last=f[f.length-1];
-    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
-    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
-  }
-});
+window.openOv=id=>document.getElementById(id).classList.add('open');
+window.closeOv=id=>document.getElementById(id).classList.remove('open');
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
 
 // ── TOAST ──
 window.toast=(msg,type='inf')=>{
   const icons={ok:'✓',err:'✕',inf:'ℹ',warn:'⚠'};const w=document.getElementById('toastC');
   const t=document.createElement('div');t.className=`toast ${type}`;
   t.innerHTML=`<span>${icons[type]}</span><span>${msg}</span>`;w.appendChild(t);
-  const dur=type==='err'?5000:type==='warn'?4000:3200;
-  setTimeout(()=>{t.style.transition='all .3s';t.style.opacity='0';t.style.transform='translateX(18px)';setTimeout(()=>t.remove(),300);},dur);
+  setTimeout(()=>{t.style.transition='all .3s';t.style.opacity='0';t.style.transform='translateX(18px)';setTimeout(()=>t.remove(),300);},3000);
 };
-
 </script>
 
-
-<nav class="mobile-nav" id="mobileNav">
+<nav class="mobile-nav" id="mobileNav" style="display:none">
   <button class="mn-item active" id="mni-grid" onclick="sv('gridView',this); setMNI(this)"><span class="mn-ico-wrap"><span class="mn-ico"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="4" width="18" height="17" rx="2" fill="currentColor" fill-opacity="0.2"/><path d="M3 9h18M8 4v2M16 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><rect x="3" y="4" width="18" height="17" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="17" cy="15" r="3.5" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.4"/><path d="M17 13.5v1.8l1 1" stroke="white" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg></span></span><span class="mn-lbl">Agenda</span></button>
   <button class="mn-item" id="mni-rooms" onclick="sv('roomsView',this); setMNI(this)"><span class="mn-ico-wrap"><span class="mn-ico"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="20" width="20" height="1.5" rx="0.75" fill="currentColor"/><rect x="4" y="6" width="2.5" height="14" rx="1" fill="currentColor" fill-opacity="0.7"/><rect x="10.75" y="6" width="2.5" height="14" rx="1" fill="currentColor" fill-opacity="0.7"/><rect x="17.5" y="6" width="2.5" height="14" rx="1" fill="currentColor" fill-opacity="0.7"/><rect x="2" y="4" width="20" height="2" rx="1" fill="currentColor" fill-opacity="0.5"/><polygon points="12,1 2,5 22,5" fill="currentColor" fill-opacity="0.4"/></svg></span></span><span class="mn-lbl">Consultorios</span></button>
   <button class="mn-item" id="mni-my" onclick="sv('myView',this); setMNI(this)"><span class="mn-ico-wrap"><span class="mn-ico"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="7" width="20" height="10" rx="2.5" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-width="1.8"/><circle cx="5.5" cy="12" r="1.5" fill="currentColor"/><circle cx="18.5" cy="12" r="1.5" fill="currentColor"/><line x1="2" y1="10" x2="22" y2="10" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2"/><line x1="2" y1="14" x2="22" y2="14" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2"/></svg></span></span><span class="mn-lbl">Mis turnos</span></button>
-  <button class="mn-item admin-only mobile-secondary" id="mni-metrics" onclick="sv('metricsView',this); setMNI(this)"><span class="mn-ico-wrap"><span class="mn-ico"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12,2 15.5,8.5 22,9.5 17,14.5 18.2,21 12,17.8 5.8,21 7,14.5 2,9.5 8.5,8.5" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><polyline points="7,16 10,11 13,13 17,8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span></span><span class="mn-lbl">Metricas</span></button>
+  <button class="mn-item admin-only" id="mni-metrics" onclick="sv('metricsView',this); setMNI(this)"><span class="mn-ico-wrap"><span class="mn-ico"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12,2 15.5,8.5 22,9.5 17,14.5 18.2,21 12,17.8 5.8,21 7,14.5 2,9.5 8.5,8.5" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><polyline points="7,16 10,11 13,13 17,8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span></span><span class="mn-lbl">Metricas</span></button>
   <button class="mn-item admin-only" id="mni-panel" onclick="sv('panelView',this); setMNI(this)"><span class="mn-ico-wrap"><span class="mn-ico"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity="0.15" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="5.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.5"/><circle cx="12" cy="12" r="2" fill="currentColor"/><line x1="12" y1="7" x2="12" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span></span><span class="mn-lbl">Panel</span></button>
-  <button class="mn-item admin-only mobile-secondary" id="mni-blocks" onclick="sv('blocksView',this); setMNI(this)"><span class="mn-ico-wrap"><span class="mn-ico"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg></span></span><span class="mn-lbl">Bloqueos</span></button>
-  <button class="mn-item admin-only" id="mni-more" onclick="toggleMobileMore()" aria-label="Más opciones"><span class="mn-ico-wrap"><span class="mn-ico" style="font-size:20px">⋯</span></span><span class="mn-lbl">Más</span></button>
-  <button class="mn-item mn-logout" onclick="doLogout()" aria-label="Cerrar sesión"><span class="mn-ico-wrap"><span class="mn-ico"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity="0.15" stroke="currentColor" stroke-width="1.8"/><line x1="8.5" y1="8.5" x2="15.5" y2="15.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="15.5" y1="8.5" x2="8.5" y2="15.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></span><span class="mn-lbl">Salir</span></button>
+  <button class="mn-item admin-only" id="mni-blocks" onclick="sv('blocksView',this); setMNI(this)"><span class="mn-ico-wrap"><span class="mn-ico"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg></span></span><span class="mn-lbl">Bloqueos</span></button>
+  <button class="mn-item mn-logout" onclick="doLogout()"><span class="mn-ico-wrap"><span class="mn-ico"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity="0.15" stroke="currentColor" stroke-width="1.8"/><line x1="8.5" y1="8.5" x2="15.5" y2="15.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="15.5" y1="8.5" x2="8.5" y2="15.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></span><span class="mn-lbl">Salir</span></button>
 </nav>
-<div class="mobile-more-menu" id="mobileMoreMenu"><button type="button" onclick="sv('metricsView',document.getElementById('sbn-metrics')); setMNI(document.getElementById('mni-more')); toggleMobileMore(false)">Métricas</button><button type="button" onclick="sv('blocksView',document.getElementById('sbn-blocks')); setMNI(document.getElementById('mni-more')); toggleMobileMore(false)">Bloqueos</button></div>
 <script>
-window.toggleMobileMore=function(force){const m=document.getElementById('mobileMoreMenu');m.classList.toggle('open', typeof force==='boolean'?force:!m.classList.contains('open'));};
 window.setMNI=function(btn){
   document.querySelectorAll('.mn-item').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
 };
 </script>
-<!-- Configuración externa requerida: Firestore Rules por rol/permisos, Storage Rules si se suben archivos, dominios autorizados en Auth y Cloud Function callable para borrar usuarios de Firebase Auth con Admin SDK. -->
 </body>
 </html>
+
+
+
+
+
