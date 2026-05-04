@@ -1,6 +1,0 @@
-<link rel="icon" type="image/png" sizes="180x180" href="/icon-180-nuevo.png">
-<link rel="icon" type="image/png" sizes="192x192" href="/icon-192-nuevo.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/icon-512-nuevo.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-180-nuevo.png">
-<link rel="manifest" href="/site_nuevo.webmanifest">
-<meta property="og:image" content="https://inhala-turnos.netlify.app/preview_nuevo.jpg">
